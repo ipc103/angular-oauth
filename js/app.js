@@ -1,30 +1,36 @@
-var example = angular.module("example", ['ui.router']);
+var example = angular.module("example", ['ui.router', 'satellizer']);
 
-example.config(function($stateProvider, $urlRouterProvider) {
-    $stateProvider
+example.config(function($stateProvider, $urlRouterProvider, $authProvider) {
+
+  $authProvider.github({
+    clientId: '5e528e5da49aaa4fb411'
+  });
+
+  $stateProvider
         .state('login', {
             url: '/login',
             templateUrl: 'templates/login.html',
             controller: 'LoginController'
         })
-        .state('secure', {
-            url: '/secure',
-            templateUrl: 'templates/secure.html',
-            controller: 'SecureController'
-        });
-    $urlRouterProvider.otherwise('/login');
+        .state('success', {
+          url: '/success',
+          templateUrl: 'templates/success.html',
+          controller: 'SuccessController'
+        })
+    $urlRouterProvider.otherwise('/success');
 });
 
-example.controller("LoginController", function($scope) {
+example.controller("LoginController", function($scope, $auth) {
 
-    $scope.login = function() {
-        window.location.href = "https://github.com/login/oauth/authorize?client_id=" + "5e528e5da49aaa4fb411"
-    }
-
-});
-
-example.controller("SecureController", function($scope) {
-    debugger;
-    $scope.accessToken = JSON.parse(window.localStorage.getItem("github")).oauth.access_token;
+    $scope.login = function(provider) {
+      $auth.authenticate(provider)
+        .then(function(response){
+          debugger;
+        })
+    };
 
 });
+
+example.controller("SuccessController", function($auth){
+  debugger;
+})
